@@ -3,6 +3,7 @@ from django.http import JsonResponse, HttpResponse, HttpRequest
 from .forms import RegisterForm
 from .serializer import RegisterSerializer
 from django.contrib.auth.models import User
+from rest_framework import generics
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.authtoken.models import Token
@@ -60,10 +61,10 @@ class CustomeLoginView(ObtainAuthToken):
 
 
 
-class RegisterView(ObtainAuthToken):
+class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
-   
+    permission_classes =[]
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
