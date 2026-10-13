@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpRequest 
 from .forms import RegisterForm
-from .serializer import RegisterSerializer
+from .serializer import RegisterSerializer, ChangePasswordSerializer
 from django.contrib.auth.models import User
 from rest_framework import generics
 from rest_framework import status
@@ -82,3 +82,69 @@ class RegisterView(generics.CreateAPIView):
                 'message':'Welcome, Status 200 Ok'
             })
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+@api_view(['post'])
+@permission_classes([])
+def custome_register(request):
+    # queryset= User.objects.all()
+    # print('first hello')
+    if request.method =="POST":
+        serializer = RegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            token, create = Token.objects.get_or_create(user=user)
+            return Response({
+                            'token':token.key,
+                            "user": {
+                                    "id": user.id,
+                                    "username": user.username,
+                                    "email": user.email
+                                },
+                            'message':'Welcome, Status 200 Ok'
+                        })
+        return Response({
+            'errors': serializer.errors,
+            'message': 'Validation failed'
+        }, status=status.HTTP_400_BAD_REQUEST)
+    return Response({
+        'error': 'Only POST method allowed'
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+
+from django.contrib.auth import authenticate
+@api_view(['POST'])
+@permission_classes([])
+def change_Password(request):
+    if request.method == "POST":
+        username = request.POST['username']
+        old_password=request.POST['old_password']
+        new_password=request.POST['new_password']
+        confirm_password = request.POST['confirm_password']
+        # print(request.data)
+        user= authenticate(request, username = username, password=old_password)
+        print('updated_user', user, request.data)
+        if user is not None:
+            if new_password == confirm_password:
+                updated_user = User.objects.update(password=new_password)
+
+                token,create = Token.objects.get_or_create(user=user)
+
+                return Response(
+                    {
+                        'Token':token.key,
+                        'User':{
+                            'User_id':user.pk,
+                            'Username':user.username,
+                            'email':user.email,
+                        },
+                        'message':'Welcome, Status 200 Ok'
+                    }
+                )
+            return Response({
+                'errors': '',
+                'message': 'Validation failed'
+            }, status=status.HTTP_400_BAD_REQUEST) 
+
+    return Response({
+        'error': 'Only POST method allowed'
+    }, status=status.HTTP_405_METHOD_NOT_ALLOWED)
+    

@@ -6,4 +6,6 @@ urlpatterns = [
     path('login/', TokenViews.obtain_auth_token),
     path('custome/login/', views.CustomeLoginView.as_view()),
     path('register/', views.RegisterView.as_view()),
+    path('custome/register', views.custome_register),
+    path('change_password/', views.change_Password),
 ]

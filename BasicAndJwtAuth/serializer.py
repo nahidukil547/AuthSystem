@@ -23,3 +23,16 @@ class RegisterSerializer(serializers.ModelSerializer):
             password = validated_data['password'],
         )
         return user
+
+class ChangePasswordSerializer(serializers.ModelSerializer):
+    old_Password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    new_Password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    confirm_password = serializers.CharField(write_only=True, required=True, style={'input_type': 'password'})
+    
+    class Meta:
+        model= User
+        fields = ('username', 'old_Password','new_Password',"confirm_password")
+    # def old_password_validate(self, value):
+    #     if user.check_password():
+        
+
