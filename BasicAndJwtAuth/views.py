@@ -41,21 +41,6 @@ class CustomeLoginView(ObtainAuthToken):
             'user_id':user.pk,
             'message':'Welcome, Status 200 Ok'
         })
-class CustomeLoginView(ObtainAuthToken):
-    def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data, context= {'request':request})
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-
-        token, create = Token.objects.get_or_create(user=user)
-
-        user.save()
-
-        return Response({
-            'token':token.key,
-            'user_id':user.pk,
-            'message':'Welcome, Status 200 Ok'
-        })
 
 
 
@@ -112,37 +97,44 @@ def custome_register(request):
 
 from django.contrib.auth import authenticate
 @api_view(['POST'])
-@permission_classes([])
+@permission_classes([IsAuthenticated])
 def change_Password(request):
     if request.method == "POST":
-        username = request.POST['username']
-        old_password=request.POST['old_password']
-        new_password=request.POST['new_password']
-        confirm_password = request.POST['confirm_password']
-        # print(request.data)
-        user= authenticate(request, username = username, password=old_password)
-        print('updated_user', user, request.data)
-        if user is not None:
-            if new_password == confirm_password:
-                updated_user = User.objects.update(password=new_password)
+        username = request.data.get('username')
+        old_password = request.data.get('old_password')
+        new_password = request.data.get('new_password')
+        confirm_password = request.data.get('confirm_password')
+        print(request.data)
+       
+        user = request.user
+        
+        if username != user.username:
+            return Response(
+                {'error': 'Username does not match the authenticated user.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        if new_password != confirm_password:
+            return Response(
+                {'error': 'New password and confirm password do not match.'}, 
+                status=status.HTTP_400_BAD_REQUEST
+            )  
+        user.set_password(new_password)
+        user.save()
 
-                token,create = Token.objects.get_or_create(user=user)
+        token,create = Token.objects.get_or_create(user=user)
 
-                return Response(
-                    {
-                        'Token':token.key,
-                        'User':{
-                            'User_id':user.pk,
-                            'Username':user.username,
-                            'email':user.email,
-                        },
-                        'message':'Welcome, Status 200 Ok'
-                    }
-                )
-            return Response({
-                'errors': '',
-                'message': 'Validation failed'
-            }, status=status.HTTP_400_BAD_REQUEST) 
+        return Response(
+            {
+                'Token':token.key,
+                'User':{
+                    'User_id':user.pk,
+                    'Username':user.username,
+                    'email':user.email,
+                },
+                'message':'Welcome, Status 200 Ok'
+            }
+        )
 
     return Response({
         'error': 'Only POST method allowed'

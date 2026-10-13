@@ -9,3 +9,28 @@ urlpatterns = [
     path('custome/register', views.custome_register),
     path('change_password/', views.change_Password),
 ]
+
+
+"""
+
+{
+    "first_name":"Jon",
+    "last_name":"doe",
+    "email":"jon@gmail.com",
+    "username":"jon",
+    "password":"123",
+    "confirm_password":"123"
+}
+
+
+{
+    "token": "f08058267a9a7015cd889787cc7155b9801ab7ff",
+    "user": {
+        "id": 5,
+        "username": "jon",
+        "email": "jon@gmail.com"
+    },
+    "message": "Welcome, Status 200 Ok"
+}
+
+"""
