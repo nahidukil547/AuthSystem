@@ -1,5 +1,6 @@
 // import { useState } from 'react'
-import ClockComp from "./components/Login"
+import Clock from "./components/Clock"
+import Login from "./components/Login"
 import { useEffect, useState } from "react"
 
 
@@ -25,7 +26,8 @@ function App({ local }) {
         {time.toLocaleTimeString(local)}
       </i>
      </p>
-      {ClockComp.print()}
+      {<Login />}
+      {<Clock area="app jsx" />}
     </>
   )
 }

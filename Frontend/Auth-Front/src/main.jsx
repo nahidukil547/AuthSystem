@@ -1,12 +1,17 @@
 import {StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
+import Login from './components/Login.jsx'
+// import Clock from './components/Login.jsx'
+import Clock from './components/Clock.jsx'
 
 // import React from 'react'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <App local ='bn-BD'/>
+    <Login />
+    <Clock area = 'Main jsx'/>
   </StrictMode>,
 )
 // createRoot.render(
